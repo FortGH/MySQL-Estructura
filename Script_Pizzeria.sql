@@ -8,28 +8,17 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- Schema mydb
 -- -----------------------------------------------------
 -- -----------------------------------------------------
--- Schema pizzeria
+-- Schema pizzeria_1
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema pizzeria
+-- Schema pizzeria_1
 -- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `pizzeria` DEFAULT CHARACTER SET utf8 ;
 USE `pizzeria` ;
 
 -- -----------------------------------------------------
--- Table `pizzeria`.`categoria`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pizzeria`.`categoria` (
-  ` id` INT(11) NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (` id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `pizzeria`.`cliente`
+-- Table `pizzeria_1`.`cliente`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pizzeria`.`cliente` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -50,7 +39,58 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `pizzeria`.`tienda`
+-- Table `pizzeria_1`.`pizza_categoria`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `pizzeria`.`pizza_categoria` (
+  ` id` INT(11) NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (` id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `pizzeria_1`.`pedido`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `pizzeria`.`pedido` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `cliente_id` INT(11) NOT NULL,
+  `fecha_hora` DATETIME NOT NULL,
+  `precio_total` FLOAT(6,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_pedido_cliente_idx` (`cliente_id` ASC),
+  CONSTRAINT `fk_pedido_cliente`
+    FOREIGN KEY (`cliente_id`)
+    REFERENCES `pizzeria`.`cliente` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `pizzeria_1`.`producto`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `pizzeria`.`producto` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  `descripcion` VARCHAR(200) NULL DEFAULT NULL,
+  `imagen` BLOB NULL DEFAULT NULL,
+  `tipo` ENUM('hamburguesa', 'pizza', 'bebida') NOT NULL,
+  `precio` FLOAT(6,2) NOT NULL,
+  `pizza_categoria_ id` INT(11) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_producto_pizza_categoria1_idx` (`pizza_categoria_ id` ASC) ,
+  CONSTRAINT `fk_producto_pizza_categoria1`
+    FOREIGN KEY (`pizza_categoria_ id`)
+    REFERENCES `pizzeria`.`pizza_categoria` (` id`)
+    ON DELETE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `pizzeria_1`.`tienda`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pizzeria`.`tienda` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -66,7 +106,7 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `pizzeria`.`empleado`
+-- Table `pizzeria_1`.`empleado`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pizzeria`.`empleado` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -89,69 +129,24 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `pizzeria`.`pedido`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pizzeria`.`pedido` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `cliente_id` INT(11) NOT NULL,
-  `fecha_hora` DATETIME NOT NULL,
-  `tipo` ENUM('tienda', 'domicilio') NOT NULL,
-  `precio_total` FLOAT(6,2) NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_pedido_cliente_idx` (`cliente_id` ASC),
-  CONSTRAINT `fk_pedido_cliente`
-    FOREIGN KEY (`cliente_id`)
-    REFERENCES `pizzeria`.`cliente` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `pizzeria`.`producto`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pizzeria`.`producto` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NOT NULL,
-  `descripcion` VARCHAR(200) NULL DEFAULT NULL,
-  `imagen` BLOB NULL DEFAULT NULL,
-  `precio` FLOAT(6,2) NOT NULL,
-  `categoria_ id` INT(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_producto_categoria1_idx` (`categoria_ id` ASC),
-  CONSTRAINT `fk_producto_categoria1`
-    FOREIGN KEY (`categoria_ id`)
-    REFERENCES `pizzeria`.`categoria` (` id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `pizzeria`.`detalle_pedido`
+-- Table `pizzeria_1`.`detalle_pedido`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pizzeria`.`detalle_pedido` (
   `pedido_id` INT(11) NOT NULL,
   `producto_id` INT(11) NOT NULL,
-  `categoria_ id` INT(11) NOT NULL,
+  `pizza_categoria_ id` INT(11) NULL DEFAULT NULL,
   `cantidad` INT(11) NOT NULL,
-  `empleado_id` INT(11) NOT NULL,
-  `fecha_entrega` DATETIME NOT NULL,
-  PRIMARY KEY (`pedido_id`, `producto_id`, `categoria_ id`, `empleado_id`),
-  INDEX `fk_detalle_pedido_categoria1_idx` (`categoria_ id` ASC) ,
+  `tipo_pedido` ENUM('tienda', 'delivery') NOT NULL,
+  `fecha_hora entrega` DATETIME NULL DEFAULT NULL,
+  `empleado_id` INT(11) NULL DEFAULT NULL,
+  PRIMARY KEY (`pedido_id`, `producto_id`),
+  INDEX `fk_detalle_pedido_categoria1_idx` (`pizza_categoria_ id` ASC) ,
   INDEX `fk_detalle_pedido_pedido1_idx` (`pedido_id` ASC) ,
-  INDEX `fk_detalle_pedido_empleado1_idx` (`empleado_id` ASC),
   INDEX `fk_detalle_pedido_producto1` (`producto_id` ASC) ,
+  INDEX `fk_detalle_pedido_empleado1_idx` (`empleado_id` ASC) ,
   CONSTRAINT `fk_detalle_pedido_categoria1`
-    FOREIGN KEY (`categoria_ id`)
-    REFERENCES `pizzeria`.`categoria` (` id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_detalle_pedido_empleado1`
-    FOREIGN KEY (`empleado_id`)
-    REFERENCES `pizzeria`.`empleado` (`id`)
+    FOREIGN KEY (`pizza_categoria_ id`)
+    REFERENCES `pizzeria`.`pizza_categoria` (` id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_detalle_pedido_pedido1`
@@ -162,6 +157,11 @@ CREATE TABLE IF NOT EXISTS `pizzeria`.`detalle_pedido` (
   CONSTRAINT `fk_detalle_pedido_producto1`
     FOREIGN KEY (`producto_id`)
     REFERENCES `pizzeria`.`producto` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_detalle_pedido_empleado1`
+    FOREIGN KEY (`empleado_id`)
+    REFERENCES `pizzeria`.`empleado` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
