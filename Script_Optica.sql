@@ -21,15 +21,15 @@ USE `optica` ;
 -- Table `optica`.`cliente`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `optica`.`cliente` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
   `apellido1` VARCHAR(45) NOT NULL,
   `apellido2` VARCHAR(45) NOT NULL,
-  `codigo_postal` INT NULL DEFAULT NULL,
+  `codigo_postal` INT(11) NULL DEFAULT NULL,
   `telefono` INT(9) NOT NULL,
   `email` VARCHAR(45) NOT NULL,
   `fecha_registro` DATE NOT NULL,
-  `cliente_id_recomendo` INT NULL,
+  `cliente_id_recomendo` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_cliente_cliente1_idx` (`cliente_id_recomendo` ASC),
   CONSTRAINT `fk_cliente_cliente1`
@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS `optica`.`cliente` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4;
 
 
@@ -46,7 +45,7 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- Table `optica`.`empleado`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `optica`.`empleado` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
   `apellido1` VARCHAR(45) NOT NULL,
   `apellido2` VARCHAR(45) NOT NULL,
@@ -60,10 +59,10 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- Table `optica`.`proveedor`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `optica`.`proveedor` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
   `telefono` INT(9) NOT NULL,
-  `fax` INT NULL DEFAULT NULL,
+  `fax` INT(11) NULL DEFAULT NULL,
   `nif` VARCHAR(9) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
@@ -74,11 +73,12 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- Table `optica`.`marca`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `optica`.`marca` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
-  `proveedor_id` INT NOT NULL,
+  `proveedor_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_marca_proveedor1_idx` (`proveedor_id` ASC),
+  INDEX `fk_marca_proveedor1_idx` (`proveedor_id` ASC) ,
+  UNIQUE INDEX `nombre_UNIQUE` (`nombre` ASC) ,
   CONSTRAINT `fk_marca_proveedor1`
     FOREIGN KEY (`proveedor_id`)
     REFERENCES `optica`.`proveedor` (`id`)
@@ -92,7 +92,7 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- Table `optica`.`gafas`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `optica`.`gafas` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `graduacion_vidrio_der` FLOAT(3,2) NULL DEFAULT NULL,
   `graduacion_vidrio_izq` FLOAT(3,2) NULL DEFAULT NULL,
   `tipo_montura` ENUM('flotante', 'pasta', 'metalica') NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `optica`.`gafas` (
   `color_vidrio_der` VARCHAR(45) NULL DEFAULT NULL,
   `color_vidrio_izq` VARCHAR(45) NULL DEFAULT NULL,
   `precio` FLOAT(8,2) NOT NULL,
-  `marca_id` INT NOT NULL,
+  `marca_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_gafas_marca1_idx` (`marca_id` ASC),
   CONSTRAINT `fk_gafas_marca1`
@@ -116,7 +116,7 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- Table `optica`.`venta`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `optica`.`venta` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `fecha` DATE NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
@@ -127,16 +127,16 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- Table `optica`.`detalle_venta`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `optica`.`detalle_venta` (
-  `venta_id` INT NOT NULL,
-  `empleado_id` INT NOT NULL,
-  `cliente_id` INT NOT NULL,
-  `gafas_id` INT NOT NULL,
+  `venta_id` INT(11) NOT NULL,
+  `empleado_id` INT(11) NOT NULL,
+  `cliente_id` INT(11) NOT NULL,
+  `gafas_id` INT(11) NOT NULL,
   PRIMARY KEY (`venta_id`, `empleado_id`, `cliente_id`, `gafas_id`),
-  INDEX `fk_detalle_venta_empleado1_idx` (`empleado_id` ASC),
-  INDEX `fk_detalle_venta_cliente1_idx` (`cliente_id` ASC),
-  INDEX `fk_detalle_venta_venta1_idx` (`venta_id` ASC),
-  INDEX `fk_detalle_venta_gafas1_idx` (`gafas_id` ASC),
-  UNIQUE INDEX `venta_id_UNIQUE` (`venta_id` ASC),
+  UNIQUE INDEX `venta_id_UNIQUE` (`venta_id` ASC) ,
+  INDEX `fk_detalle_venta_empleado1_idx` (`empleado_id` ASC) ,
+  INDEX `fk_detalle_venta_cliente1_idx` (`cliente_id` ASC) ,
+  INDEX `fk_detalle_venta_venta1_idx` (`venta_id` ASC) ,
+  INDEX `fk_detalle_venta_gafas1_idx` (`gafas_id` ASC) ,
   CONSTRAINT `fk_detalle_venta_cliente1`
     FOREIGN KEY (`cliente_id`)
     REFERENCES `optica`.`cliente` (`id`)
@@ -165,13 +165,13 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- Table `optica`.`direccion_provedor`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `optica`.`direccion_provedor` (
-  `proveedor_id` INT NOT NULL,
+  `proveedor_id` INT(11) NOT NULL,
   `calle` VARCHAR(45) NOT NULL,
-  `numero` INT NOT NULL,
+  `numero` INT(11) NOT NULL,
   `piso` VARCHAR(45) NULL DEFAULT NULL,
   `puerta` VARCHAR(45) NULL DEFAULT NULL,
   `ciudad` VARCHAR(45) NOT NULL,
-  `codigo_postal` INT NOT NULL,
+  `codigo_postal` INT(11) NOT NULL,
   `pais` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`proveedor_id`),
   CONSTRAINT `fk_direccion_provedor_proveedor1`
