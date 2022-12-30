@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS `optica`.`cliente` (
   `nombre` VARCHAR(45) NOT NULL,
   `apellido1` VARCHAR(45) NOT NULL,
   `apellido2` VARCHAR(45) NOT NULL,
-  `codigo_postal` INT(11) NULL DEFAULT NULL,
-  `telefono` INT(9) NOT NULL,
+  `codigo_postal` VARCHAR(10) NULL DEFAULT NULL,
+  `telefono` INT(20) NOT NULL,
   `email` VARCHAR(45) NOT NULL,
   `fecha_registro` DATE NOT NULL,
   `cliente_id_recomendo` INT(11) NULL DEFAULT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `optica`.`empleado` (
   `nombre` VARCHAR(45) NOT NULL,
   `apellido1` VARCHAR(45) NOT NULL,
   `apellido2` VARCHAR(45) NOT NULL,
-  `telefono` INT(9) NOT NULL,
+  `telefono` INT(20) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
@@ -61,8 +61,8 @@ DEFAULT CHARACTER SET = utf8mb4;
 CREATE TABLE IF NOT EXISTS `optica`.`proveedor` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
-  `telefono` INT(9) NOT NULL,
-  `fax` INT(11) NULL DEFAULT NULL,
+  `telefono` INT(20) NOT NULL,
+  `fax` INT(20) NULL DEFAULT NULL,
   `nif` VARCHAR(9) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
@@ -77,8 +77,7 @@ CREATE TABLE IF NOT EXISTS `optica`.`marca` (
   `nombre` VARCHAR(45) NOT NULL,
   `proveedor_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_marca_proveedor1_idx` (`proveedor_id` ASC) ,
-  UNIQUE INDEX `nombre_UNIQUE` (`nombre` ASC) ,
+  INDEX `fk_marca_proveedor1_idx` (`proveedor_id` ASC),
   CONSTRAINT `fk_marca_proveedor1`
     FOREIGN KEY (`proveedor_id`)
     REFERENCES `optica`.`proveedor` (`id`)
@@ -132,11 +131,11 @@ CREATE TABLE IF NOT EXISTS `optica`.`detalle_venta` (
   `cliente_id` INT(11) NOT NULL,
   `gafas_id` INT(11) NOT NULL,
   PRIMARY KEY (`venta_id`, `empleado_id`, `cliente_id`, `gafas_id`),
-  UNIQUE INDEX `venta_id_UNIQUE` (`venta_id` ASC) ,
-  INDEX `fk_detalle_venta_empleado1_idx` (`empleado_id` ASC) ,
-  INDEX `fk_detalle_venta_cliente1_idx` (`cliente_id` ASC) ,
-  INDEX `fk_detalle_venta_venta1_idx` (`venta_id` ASC) ,
-  INDEX `fk_detalle_venta_gafas1_idx` (`gafas_id` ASC) ,
+  UNIQUE INDEX `venta_id_UNIQUE` (`venta_id` ASC),
+  INDEX `fk_detalle_venta_empleado1_idx` (`empleado_id` ASC),
+  INDEX `fk_detalle_venta_cliente1_idx` (`cliente_id` ASC),
+  INDEX `fk_detalle_venta_venta1_idx` (`venta_id` ASC),
+  INDEX `fk_detalle_venta_gafas1_idx` (`gafas_id` ASC),
   CONSTRAINT `fk_detalle_venta_cliente1`
     FOREIGN KEY (`cliente_id`)
     REFERENCES `optica`.`cliente` (`id`)
@@ -171,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `optica`.`direccion_provedor` (
   `piso` VARCHAR(45) NULL DEFAULT NULL,
   `puerta` VARCHAR(45) NULL DEFAULT NULL,
   `ciudad` VARCHAR(45) NOT NULL,
-  `codigo_postal` INT(11) NOT NULL,
+  `codigo_postal` VARCHAR(10) NOT NULL,
   `pais` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`proveedor_id`),
   CONSTRAINT `fk_direccion_provedor_proveedor1`
